@@ -9,7 +9,7 @@ final FlutterAppAuth appAuth = FlutterAppAuth();
 
 final AuthorizationTokenRequest tokenRequest = AuthorizationTokenRequest(
   'interno_cliente_test',
-  'https://interno.tia.com.ec/authentication/login',
+  'io.tia.interno://login-callback', //'https://interno.tia.com.ec/authentication/login',
   issuer: 'http://pedidosdomicilio.tia.com.ec:9080/auth/realms/interno_test/',
   scopes: ['openid', 'profile', 'email'],
   allowInsecureConnections: true, // Ajusta los scopes según tus necesidades
