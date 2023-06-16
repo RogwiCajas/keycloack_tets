@@ -41,6 +41,8 @@ class FlutterKeycloakExample extends StatefulWidget {
 }
 
 class FlutterKeycloakExampleState extends State<FlutterKeycloakExample> {
+  TextEditingController controller = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -58,11 +60,23 @@ class FlutterKeycloakExampleState extends State<FlutterKeycloakExample> {
           title: Text(widget.title),
         ),
         body: Center(
-          child: ElevatedButton(
-            onPressed: () async {
-              requestAuth(tokenRequest);
-            },
-            child: const Text("Iniciar Sesion"),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextField(
+                controller: controller,
+              ),
+              const SizedBox(
+                height: 200,
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  requestAuth(tokenRequest);
+                  setState(() {});
+                },
+                child: const Text("Iniciar Sesion"),
+              ),
+            ],
           ),
         ));
   }
@@ -79,6 +93,16 @@ class FlutterKeycloakExampleState extends State<FlutterKeycloakExample> {
 
       // Usa los kens para acceder a recursos protegidos en tu aplicación móvil.
       print("si");
+      print(result.tokenType);
+      print(accessToken);
+      print(refreshToken);
+      print(tokenExpiration);
+      print(result.authorizationAdditionalParameters);
+      print(result.idToken);
+      print(result.scopes);
+
+      print(result.tokenAdditionalParameters);
+      controller.text = accessToken!;
     } else {
       // La autenticación falló o el usuario canceló el inicio de sesión.
       print("no");
