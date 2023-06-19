@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_appauth/flutter_appauth.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 
 void main() async {
   runApp(const MyApp());
 }
-
+void _asdasd(){
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
+}
 final FlutterAppAuth appAuth = FlutterAppAuth();
 
 final AuthorizationTokenRequest tokenRequest = AuthorizationTokenRequest(
@@ -28,6 +32,7 @@ class MyApp extends StatelessWidget {
       ),
       home: const FlutterKeycloakExample('Flutter Keycloak Example'),
     );
+  
   }
 }
 
@@ -41,10 +46,14 @@ class FlutterKeycloakExample extends StatefulWidget {
 }
 
 class FlutterKeycloakExampleState extends State<FlutterKeycloakExample> {
+  TextEditingController controller1 = TextEditingController();
   TextEditingController controller = TextEditingController();
+  TextEditingController controller2 = TextEditingController();
+  TextEditingController controller3 = TextEditingController();
 
   @override
   void initState() {
+    _asdasd();
     super.initState();
   }
 
@@ -64,7 +73,16 @@ class FlutterKeycloakExampleState extends State<FlutterKeycloakExample> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               TextField(
+                controller: controller1,
+              ),
+              TextField(
                 controller: controller,
+              ),
+              TextField(
+                controller: controller2,
+              ),
+              TextField(
+                controller: controller3,
               ),
               const SizedBox(
                 height: 200,
@@ -82,6 +100,10 @@ class FlutterKeycloakExampleState extends State<FlutterKeycloakExample> {
   }
 
   void requestAuth(AuthorizationTokenRequest tokenRequest) async {
+      controller.text = "";
+      controller1.text = "";
+      controller2.text = "";
+      controller3.text = "";
     final AuthorizationTokenResponse? result =
         await appAuth.authorizeAndExchangeCode(tokenRequest);
 
@@ -102,9 +124,16 @@ class FlutterKeycloakExampleState extends State<FlutterKeycloakExample> {
       print(result.scopes);
 
       print(result.tokenAdditionalParameters);
-      controller.text = accessToken!;
+      String yourToken = accessToken.toString();
+      Map<String, dynamic> decodedToken = JwtDecoder.decode(yourToken);
+      controller1.text = accessToken.toString();
+      controller.text = decodedToken["name"]!;
+      controller2.text = decodedToken["email"]!;
+      controller3.text = decodedToken["resource_access"]["interno_cliente_test"]["roles"].toString()!;
+      print(decodedToken);
+      //controller3.text = decodedToken["resource_access"]!;
     } else {
-      // La autenticación falló o el usuario canceló el inicio de sesión.
+      // La autenticación falló o el usuario canceló el inicio de sesión.controller.text = decodedToken["name"]!;
       print("no");
     }
   }
