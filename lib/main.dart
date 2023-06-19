@@ -6,9 +6,7 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 void main() async {
   runApp(const MyApp());
 }
-void _asdasd(){
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
-}
+
 final FlutterAppAuth appAuth = FlutterAppAuth();
 
 final AuthorizationTokenRequest tokenRequest = AuthorizationTokenRequest(
@@ -32,7 +30,6 @@ class MyApp extends StatelessWidget {
       ),
       home: const FlutterKeycloakExample('Flutter Keycloak Example'),
     );
-  
   }
 }
 
@@ -51,9 +48,12 @@ class FlutterKeycloakExampleState extends State<FlutterKeycloakExample> {
   TextEditingController controller2 = TextEditingController();
   TextEditingController controller3 = TextEditingController();
 
+  String rol = "";
+  List<String> permisos = [];
+
   @override
   void initState() {
-    _asdasd();
+    permisos = [];
     super.initState();
   }
 
@@ -69,41 +69,57 @@ class FlutterKeycloakExampleState extends State<FlutterKeycloakExample> {
           title: Text(widget.title),
         ),
         body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              TextField(
-                controller: controller1,
-              ),
-              TextField(
-                controller: controller,
-              ),
-              TextField(
-                controller: controller2,
-              ),
-              TextField(
-                controller: controller3,
-              ),
-              const SizedBox(
-                height: 200,
-              ),
-              ElevatedButton(
-                onPressed: () async {
-                  requestAuth(tokenRequest);
-                  setState(() {});
-                },
-                child: const Text("Iniciar Sesion"),
-              ),
-            ],
+          child: Padding(
+            padding: const EdgeInsets.all(40.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextField(
+                  controller: controller1,
+                ),
+                TextField(
+                  controller: controller,
+                ),
+                TextField(
+                  controller: controller2,
+                ),
+                // TextField(
+                //   controller: controller3,
+                // ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Card(child: Text("ROL: $rol")),
+                const SizedBox(
+                  height: 10,
+                ),
+                const Card(child: Text("PERMISOS:")),
+                for (var permiso in permisos) Card(child: Text(permiso)),
+
+                const SizedBox(
+                  height: 200,
+                ),
+
+                ElevatedButton(
+                  onPressed: () async {
+                    requestAuth(tokenRequest);
+                    setState(() {});
+                  },
+                  child: const Text("Iniciar Sesion"),
+                ),
+              ],
+            ),
           ),
         ));
   }
 
   void requestAuth(AuthorizationTokenRequest tokenRequest) async {
-      controller.text = "";
-      controller1.text = "";
-      controller2.text = "";
-      controller3.text = "";
+    permisos = [];
+    rol = "";
+    controller.text = "";
+    controller1.text = "";
+    controller2.text = "";
+    controller3.text = "";
     final AuthorizationTokenResponse? result =
         await appAuth.authorizeAndExchangeCode(tokenRequest);
 
@@ -129,9 +145,23 @@ class FlutterKeycloakExampleState extends State<FlutterKeycloakExample> {
       controller1.text = accessToken.toString();
       controller.text = decodedToken["name"]!;
       controller2.text = decodedToken["email"]!;
-      controller3.text = decodedToken["resource_access"]["interno_cliente_test"]["roles"].toString()!;
+      controller3.text = decodedToken["resource_access"]["interno_cliente_test"]
+              ["roles"]
+          .toString()!;
+
+      /**Recorrer y añadir permisos y roles */
+      for (var element in decodedToken["resource_access"]
+          ["interno_cliente_test"]["roles"]) {
+        if (element.toString().startsWith("/")) {
+          permisos.add(element);
+        } else {
+          rol = element;
+        }
+      }
+
       print(decodedToken);
       //controller3.text = decodedToken["resource_access"]!;
+      setState(() {});
     } else {
       // La autenticación falló o el usuario canceló el inicio de sesión.controller.text = decodedToken["name"]!;
       print("no");
